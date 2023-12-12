@@ -1,8 +1,27 @@
-# TomoChain
-
-[![Build Status](https://travis-ci.org/tomochain/tomochain.svg?branch=master)](https://travis-ci.org/tomochain/tomochain)
-[![codecov](https://codecov.io/gh/tomochain/tomochain/branch/master/graph/badge.svg)](https://codecov.io/gh/tomochain/tomochain)
-[![Join the chat at https://gitter.im/tomochain/tomochain](https://badges.gitter.im/tomochain/tomochain.svg)](https://gitter.im/tomochain/tomochain?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<p align="center">
+  <a href="https://github.com/tomochain/tomochain">
+    <img src="https://tomochain.com/wp-content/uploads/2020/02/logo-tomochain-fl.svg" alt="Logo" width="250">
+  </a>
+  <br>
+  <p align="center">
+    The Efficient Blockchain Powered By Proof Of Stake Voting Consensus
+    <br>
+    <a href="https://tomochain.com/"><strong>Explore the Website »</strong></a>
+    <br>
+    <br>
+  <a href="https://travis-ci.org/tomochain/tomochain">
+  <img src="https://travis-ci.org/tomochain/tomochain.svg?branch=master" alt="Build_Status">
+  </a>
+  .
+  <a href="https://codecov.io/gh/tomochain/tomochain">
+  <img src="https://codecov.io/gh/tomochain/tomochain/branch/master/graph/badge.svg" alt="codecov">
+  </a>
+  .
+  <a href="https://gitter.im/tomochain/tomochain?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
+  <img src="https://badges.gitter.im/tomochain/tomochain.svg" alt="Join_the_chat_at_https://gitter.im/tomochain/tomochain">
+  </a>
+  </p>
+<br>
 
 ## About TomoChain
 
