@@ -518,6 +518,13 @@ func (bc *BlockChain) OrderStateAt(block *types.Block) (*tradingstate.TradingSta
 			} else {
 				return nil, err
 			}
+		} else {
+			tomoxState, err := tomoXService.GetEmptyTradingState()
+			if err == nil {
+				return tomoxState, nil
+			} else {
+				return nil, err
+			}
 		}
 	}
 	return nil, errors.New("Get tomox state fail")

@@ -515,7 +515,7 @@ func (api *PrivateDebugAPI) computeStateDB(block *types.Block, reexec uint64) (*
 			break
 		}
 		if statedb, err = state.New(block.Root(), database); err == nil {
-			tomoxState, err = tradingstate.New(block.Root(), tradingstate.NewDatabase(api.eth.TomoX.GetLevelDB()))
+			tomoxState, err = api.eth.blockchain.OrderStateAt(block)
 			if err == nil {
 				break
 			}
