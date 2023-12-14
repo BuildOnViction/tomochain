@@ -48,3 +48,6 @@ profile.cov
 /dashboard/assets/package-lock.json
 
 **/yarn-error.log
+
+
+.env

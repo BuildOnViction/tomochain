@@ -21,11 +21,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tomochain/tomochain/tomoxlending/lendingstate"
 	"math/big"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/tomochain/tomochain/tomoxlending/lendingstate"
 
 	"github.com/tomochain/tomochain/tomox/tradingstate"
 
@@ -424,7 +425,8 @@ func (s *PrivateAccountAPI) SignTransaction(ctx context.Context, args SendTxArgs
 // safely used to calculate a signature from.
 //
 // The hash is calulcated as
-//   keccak256("\x19Ethereum Signed Message:\n"${message length}${message}).
+//
+//	keccak256("\x19Ethereum Signed Message:\n"${message length}${message}).
 //
 // This gives context to the signed message and prevents signing of transactions.
 func signHash(data []byte) []byte {
@@ -1196,7 +1198,7 @@ func FormatLogs(logs []vm.StructLog) []StructLogRes {
 		if trace.Stack != nil {
 			stack := make([]string, len(trace.Stack))
 			for i, stackValue := range trace.Stack {
-				stack[i] = fmt.Sprintf("%x", math.PaddedBigBytes(stackValue, 32))
+				stack[i] = stackValue.Hex()
 			}
 			formatted[index].Stack = &stack
 		}
@@ -1305,8 +1307,8 @@ func (s *PublicBlockChainAPI) findNearestSignedBlock(ctx context.Context, b *typ
 }
 
 /*
-	findFinalityOfBlock return finality of a block
-	Use blocksHashCache for to keep track - refer core/blockchain.go for more detail
+findFinalityOfBlock return finality of a block
+Use blocksHashCache for to keep track - refer core/blockchain.go for more detail
 */
 func (s *PublicBlockChainAPI) findFinalityOfBlock(ctx context.Context, b *types.Block, masternodes []common.Address) (uint, error) {
 	engine, _ := s.b.GetEngine().(*posv.Posv)
@@ -1371,7 +1373,7 @@ func (s *PublicBlockChainAPI) findFinalityOfBlock(ctx context.Context, b *types.
 }
 
 /*
-	Extract signers from block
+Extract signers from block
 */
 func (s *PublicBlockChainAPI) getSigners(ctx context.Context, block *types.Block, engine *posv.Posv) ([]common.Address, error) {
 	var err error
@@ -2965,7 +2967,8 @@ func GetSignersFromBlocks(b Backend, blockNumber uint64, blockHash common.Hash, 
 // GetStakerROI Estimate ROI for stakers using the last epoc reward
 // then multiple by epoch per year, if the address is not masternode of last epoch - return 0
 // Formular:
-// 		ROI = average_latest_epoch_reward_for_voters*number_of_epoch_per_year/latest_total_cap*100
+//
+//	ROI = average_latest_epoch_reward_for_voters*number_of_epoch_per_year/latest_total_cap*100
 func (s *PublicBlockChainAPI) GetStakerROI() float64 {
 	blockNumber := s.b.CurrentBlock().Number().Uint64()
 	lastCheckpointNumber := blockNumber - (blockNumber % s.b.ChainConfig().Posv.Epoch) - s.b.ChainConfig().Posv.Epoch // calculate for 2 epochs ago
@@ -2991,7 +2994,8 @@ func (s *PublicBlockChainAPI) GetStakerROI() float64 {
 // GetStakerROIMasternode Estimate ROI for stakers of a specific masternode using the last epoc reward
 // then multiple by epoch per year, if the address is not masternode of last epoch - return 0
 // Formular:
-// 		ROI = latest_epoch_reward_for_voters*number_of_epoch_per_year/latest_total_cap*100
+//
+//	ROI = latest_epoch_reward_for_voters*number_of_epoch_per_year/latest_total_cap*100
 func (s *PublicBlockChainAPI) GetStakerROIMasternode(masternode common.Address) float64 {
 	votersReward := s.b.GetVotersRewards(masternode)
 	if votersReward == nil {

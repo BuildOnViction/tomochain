@@ -16,11 +16,12 @@ require (
 	github.com/fatih/color v1.6.0
 	github.com/gizak/termui v2.2.0+incompatible
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
-	github.com/go-stack/stack v1.8.0
-	github.com/golang/protobuf v1.3.2
-	github.com/golang/snappy v0.0.1
-	github.com/hashicorp/golang-lru v0.5.3
-	github.com/huin/goupnp v1.0.0
+	github.com/go-stack/stack v1.8.1
+	github.com/golang/protobuf v1.5.3
+	github.com/golang/snappy v0.0.4
+	github.com/hashicorp/golang-lru v0.5.4
+	github.com/holiman/uint256 v1.2.2
+	github.com/huin/goupnp v1.2.0
 	github.com/influxdata/influxdb v1.7.9
 	github.com/jackpal/go-nat-pmp v1.0.2-0.20160603034137-1fa385a6f458
 	github.com/julienschmidt/httprouter v1.3.0
@@ -45,7 +46,7 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
 	gopkg.in/karalabe/cookiejar.v2 v2.0.0-20150724131613-8dcd6a7f4951
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
-	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20190213234257-ec84240a7772
+	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20210326210528-650f7c854440
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
 
@@ -53,7 +54,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
-	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/google/uuid v1.0.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
@@ -71,6 +71,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.8 // indirect
+	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 )

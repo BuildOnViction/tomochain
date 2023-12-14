@@ -24,6 +24,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/holiman/uint256"
 	"github.com/tomochain/tomochain/common"
 	"github.com/tomochain/tomochain/common/hexutil"
 	"github.com/tomochain/tomochain/common/math"
@@ -65,7 +66,7 @@ type StructLog struct {
 	GasCost       uint64                      `json:"gasCost"`
 	Memory        []byte                      `json:"memory"`
 	MemorySize    int                         `json:"memSize"`
-	Stack         []*big.Int                  `json:"stack"`
+	Stack         []uint256.Int               `json:"stack"`
 	Storage       map[common.Hash]common.Hash `json:"-"`
 	Depth         int                         `json:"depth"`
 	RefundCounter uint64                      `json:"refund"`
@@ -156,8 +157,8 @@ func (l *StructLogger) CaptureState(env *EVM, pc uint64, op OpCode, gas, cost ui
 	// it in the local storage container.
 	if op == SSTORE && stack.len() >= 2 {
 		var (
-			value   = common.BigToHash(stack.data[stack.len()-2])
-			address = common.BigToHash(stack.data[stack.len()-1])
+			value   = common.Hash(stack.data[stack.len()-2].Bytes32())
+			address = common.Hash(stack.data[stack.len()-1].Bytes32())
 		)
 		l.changedValues[contract.Address()][address] = value
 	}
@@ -168,11 +169,11 @@ func (l *StructLogger) CaptureState(env *EVM, pc uint64, op OpCode, gas, cost ui
 		copy(mem, memory.Data())
 	}
 	// Copy a snapshot of the current stack state to a new buffer
-	var stck []*big.Int
+	var stck []uint256.Int
 	if !l.cfg.DisableStack {
-		stck = make([]*big.Int, len(stack.Data()))
+		stck = make([]uint256.Int, len(stack.Data()))
 		for i, item := range stack.Data() {
-			stck[i] = new(big.Int).Set(item)
+			stck[i] = item
 		}
 	}
 	// Copy a snapshot of the current storage to a new container
@@ -227,7 +228,7 @@ func WriteTrace(writer io.Writer, logs []StructLog) {
 		if len(log.Stack) > 0 {
 			fmt.Fprintln(writer, "Stack:")
 			for i := len(log.Stack) - 1; i >= 0; i-- {
-				fmt.Fprintf(writer, "%08d  %x\n", len(log.Stack)-i-1, math.PaddedBigBytes(log.Stack[i], 32))
+				fmt.Fprintf(writer, "%08d  %x\n", len(log.Stack)-i-1, log.Stack[i].Hex())
 			}
 		}
 		if len(log.Memory) > 0 {
