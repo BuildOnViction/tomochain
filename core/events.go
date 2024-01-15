@@ -21,8 +21,8 @@ import (
 	"github.com/tomochain/tomochain/core/types"
 )
 
-// TxPreEvent is posted when a transaction enters the transaction pool.
-type TxPreEvent struct{ Tx *types.Transaction }
+// NewTxsEvent is posted when a batch of transactions enters the transaction pool.
+type NewTxsEvent struct{ Txs []*types.Transaction }
 
 // OrderTxPreEvent is posted when a order transaction enters the order transaction pool.
 type OrderTxPreEvent struct{ Tx *types.OrderTransaction }

@@ -334,9 +334,9 @@ func (pool *LendingPool) Stop() {
 	log.Info("Transaction pool stopped")
 }
 
-// SubscribeTxPreEvent registers a subscription of TxPreEvent and
+// SubscribeNewTxsEvent registers a subscription of NewTxsEvent and
 // starts sending event to the given channel.
-func (pool *LendingPool) SubscribeTxPreEvent(ch chan<- LendingTxPreEvent) event.Subscription {
+func (pool *LendingPool) SubscribeNewTxsEvent(ch chan<- LendingTxPreEvent) event.Subscription {
 	return pool.scope.Track(pool.txFeed.Subscribe(ch))
 }
 
