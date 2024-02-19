@@ -36,10 +36,12 @@ import (
 	"time"
 
 	"github.com/golang/snappy"
+
 	"github.com/tomochain/tomochain/crypto"
 	"github.com/tomochain/tomochain/crypto/ecies"
 	"github.com/tomochain/tomochain/crypto/secp256k1"
 	"github.com/tomochain/tomochain/crypto/sha3"
+	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/p2p/discover"
 	"github.com/tomochain/tomochain/rlp"
 )
@@ -92,14 +94,30 @@ func (t *rlpx) ReadMsg() (Msg, error) {
 	t.rmu.Lock()
 	defer t.rmu.Unlock()
 	t.fd.SetReadDeadline(time.Now().Add(frameReadTimeout))
-	return t.rw.ReadMsg()
+	msg, err := t.rw.ReadMsg()
+	if err == nil {
+		msg.meterSize = msg.Size
+	}
+	return msg, err
 }
 
 func (t *rlpx) WriteMsg(msg Msg) error {
 	t.wmu.Lock()
 	defer t.wmu.Unlock()
 	t.fd.SetWriteDeadline(time.Now().Add(frameWriteTimeout))
-	return t.rw.WriteMsg(msg)
+	err := t.rw.WriteMsg(msg)
+	if err != nil {
+		return err
+	}
+
+	// Set metrics.
+	msg.meterSize = msg.Size
+	if metrics.Enabled && msg.meterCap.Name != "" { // don't meter non-subprotocol messages
+		m := fmt.Sprintf("%s/%s/%d/%#02x", egressMeterName, msg.meterCap.Name, msg.meterCap.Version, msg.meterCode)
+		metrics.GetOrRegisterMeter(m, nil).Mark(int64(msg.meterSize))
+		metrics.GetOrRegisterMeter(m+"/packets", nil).Mark(1)
+	}
+	return nil
 }
 
 func (t *rlpx) close(err error) {

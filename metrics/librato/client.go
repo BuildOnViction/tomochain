@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -65,7 +65,7 @@ type Batch struct {
 	Source      string        `json:"source"`
 }
 
-func (self *LibratoClient) PostMetrics(batch Batch) (err error) {
+func (c *LibratoClient) PostMetrics(batch Batch) (err error) {
 	var (
 		js   []byte
 		req  *http.Request
@@ -80,23 +80,25 @@ func (self *LibratoClient) PostMetrics(batch Batch) (err error) {
 		return
 	}
 
-	if req, err = http.NewRequest("POST", MetricsPostUrl, bytes.NewBuffer(js)); err != nil {
+	if req, err = http.NewRequest(http.MethodPost, MetricsPostUrl, bytes.NewBuffer(js)); err != nil {
 		return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(self.Email, self.Token)
+	req.SetBasicAuth(c.Email, c.Token)
 
-	if resp, err = http.DefaultClient.Do(req); err != nil {
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
 		return
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		var body []byte
-		if body, err = ioutil.ReadAll(resp.Body); err != nil {
+		if body, err = io.ReadAll(resp.Body); err != nil {
 			body = []byte(fmt.Sprintf("(could not fetch response body for error: %s)", err))
 		}
-		err = fmt.Errorf("Unable to post to Librato: %d %s %s", resp.StatusCode, resp.Status, string(body))
+		err = fmt.Errorf("unable to post to Librato: %d %s %s", resp.StatusCode, resp.Status, string(body))
 	}
 	return
 }

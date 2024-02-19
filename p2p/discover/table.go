@@ -36,6 +36,7 @@ import (
 	"github.com/tomochain/tomochain/common"
 	"github.com/tomochain/tomochain/crypto"
 	"github.com/tomochain/tomochain/log"
+	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/p2p/netutil"
 )
 
@@ -82,7 +83,8 @@ type Table struct {
 	bonding   map[NodeID]*bondproc
 	bondslots chan struct{} // limits total number of active bonding processes
 
-	nodeAddedHook func(*Node) // for testing
+	nodeAddedHook   func(*bucket, *Node)
+	nodeRemovedHook func(*bucket, *Node)
 
 	net  transport
 	self *Node // metadata of the local node
@@ -110,6 +112,7 @@ type bucket struct {
 	entries      []*Node // live entries, sorted by time of last contact
 	replacements []*Node // recently seen nodes to be used if revalidation fails
 	ips          netutil.DistinctNetSet
+	index        int
 }
 
 func newTable(t transport, ourID NodeID, ourAddr *net.UDPAddr, nodeDBPath string, bootnodes []*Node) (*Table, error) {
@@ -149,6 +152,22 @@ func newTable(t transport, ourID NodeID, ourAddr *net.UDPAddr, nodeDBPath string
 	// expiration.
 	tab.db.ensureExpirer()
 	go tab.loop()
+	return tab, nil
+}
+
+func newMeteredTable(t transport, ourID NodeID, ourAddr *net.UDPAddr, nodeDBPath string, bootnodes []*Node) (*Table, error) {
+	tab, err := newTable(t, ourID, ourAddr, nodeDBPath, bootnodes)
+	if err != nil {
+		return nil, err
+	}
+	if metrics.Enabled {
+		tab.nodeAddedHook = func(b *bucket, n *Node) {
+			bucketsCounter[b.index].Inc(1)
+		}
+		tab.nodeRemovedHook = func(b *bucket, n *Node) {
+			bucketsCounter[b.index].Dec(1)
+		}
+	}
 	return tab, nil
 }
 
@@ -806,7 +825,7 @@ func (tab *Table) bumpOrAdd(b *bucket, n *Node) bool {
 	b.replacements = deleteNode(b.replacements, n)
 	n.addedAt = time.Now()
 	if tab.nodeAddedHook != nil {
-		tab.nodeAddedHook(n)
+		tab.nodeAddedHook(b, n)
 	}
 	return true
 }
@@ -814,6 +833,9 @@ func (tab *Table) bumpOrAdd(b *bucket, n *Node) bool {
 func (tab *Table) deleteInBucket(b *bucket, n *Node) {
 	b.entries = deleteNode(b.entries, n)
 	tab.removeIP(b, n.IP)
+	if tab.nodeRemovedHook != nil {
+		tab.nodeRemovedHook(b, n)
+	}
 }
 
 // pushNode adds n to the front of list, keeping at most max items.

@@ -24,8 +24,10 @@ import (
 	"time"
 
 	mapset "github.com/deckarep/golang-set"
+
 	"github.com/tomochain/tomochain/common"
 	"github.com/tomochain/tomochain/core/types"
+	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/p2p"
 	"github.com/tomochain/tomochain/rlp"
 )
@@ -345,10 +347,12 @@ func (p *peer) Handshake(network uint64, td *big.Int, head common.Hash, genesis 
 	for i := 0; i < 2; i++ {
 		select {
 		case err := <-errc:
+			markError(p, err)
 			if err != nil {
 				return err
 			}
 		case <-timeout.C:
+			markError(p, p2p.DiscReadTimeout)
 			return p2p.DiscReadTimeout
 		}
 	}
@@ -543,4 +547,24 @@ func (ps *peerSet) Close() {
 		p.Disconnect(p2p.DiscQuitting)
 	}
 	ps.closed = true
+}
+
+// markError registers the error with the corresponding metric.
+func markError(p *peer, err error) {
+	if !metrics.Enabled {
+		return
+	}
+	m := meters.get(p.Inbound())
+	switch errors.Unwrap(err) {
+	case errors.New(errCode(ErrNetworkIdMismatch).String()):
+		m.networkIDMismatch.Mark(1)
+	case errors.New(errCode(ErrProtocolVersionMismatch).String()):
+		m.protocolVersionMismatch.Mark(1)
+	case errors.New(errCode(ErrGenesisBlockMismatch).String()):
+		m.genesisMismatch.Mark(1)
+	case p2p.DiscReadTimeout:
+		m.timeoutError.Mark(1)
+	default:
+		m.peerError.Mark(1)
+	}
 }

@@ -27,6 +27,7 @@ import (
 	"github.com/tomochain/tomochain/common/mclock"
 	"github.com/tomochain/tomochain/event"
 	"github.com/tomochain/tomochain/log"
+	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/p2p/discover"
 	"github.com/tomochain/tomochain/rlp"
 )
@@ -289,6 +290,11 @@ func (p *Peer) handle(msg Msg) error {
 		if err != nil {
 			return fmt.Errorf("msg code out of range: %v", msg.Code)
 		}
+		if metrics.Enabled {
+			m := fmt.Sprintf("%s/%s/%d/%#02x", ingressMeterName, proto.Name, proto.Version, msg.Code-proto.offset)
+			metrics.GetOrRegisterMeter(m, nil).Mark(int64(msg.meterSize))
+			metrics.GetOrRegisterMeter(m+"/packets", nil).Mark(1)
+		}
 		select {
 		case proto.in <- msg:
 			return nil
@@ -388,6 +394,9 @@ func (rw *protoRW) WriteMsg(msg Msg) (err error) {
 	if msg.Code >= rw.Length {
 		return newPeerError(errInvalidMsgCode, "not handled")
 	}
+	msg.meterCap = rw.cap()
+	msg.meterCode = msg.Code
+
 	msg.Code += rw.offset
 	select {
 	case <-rw.wstart:

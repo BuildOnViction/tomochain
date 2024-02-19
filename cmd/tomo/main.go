@@ -24,6 +24,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/urfave/cli.v1"
+
 	"github.com/tomochain/tomochain/accounts"
 	"github.com/tomochain/tomochain/accounts/keystore"
 	"github.com/tomochain/tomochain/cmd/utils"
@@ -36,7 +38,6 @@ import (
 	"github.com/tomochain/tomochain/log"
 	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/node"
-	"gopkg.in/urfave/cli.v1"
 )
 
 const (
@@ -118,6 +119,7 @@ var (
 		utils.RPCVirtualHostsFlag,
 		utils.EthStatsURLFlag,
 		utils.MetricsEnabledFlag,
+		utils.MetricsEnabledExpensiveFlag,
 		//utils.FakePoWFlag,
 		//utils.NoCompactionFlag,
 		//utils.GpoBlocksFlag,

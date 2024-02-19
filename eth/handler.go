@@ -37,6 +37,7 @@ import (
 	"github.com/tomochain/tomochain/ethdb"
 	"github.com/tomochain/tomochain/event"
 	"github.com/tomochain/tomochain/log"
+	"github.com/tomochain/tomochain/metrics"
 	"github.com/tomochain/tomochain/p2p"
 	"github.com/tomochain/tomochain/p2p/discover"
 	"github.com/tomochain/tomochain/params"
@@ -61,7 +62,7 @@ var (
 var errIncompatibleConfig = errors.New("incompatible configuration")
 
 func errResp(code errCode, format string, v ...interface{}) error {
-	return fmt.Errorf("%v - %v", code, fmt.Sprintf(format, v...))
+	return fmt.Errorf("%w - %v", errors.New(code.String()), fmt.Sprintf(format, v...))
 }
 
 type ProtocolManager struct {
@@ -390,6 +391,19 @@ func (pm *ProtocolManager) handleMsg(p *peer) error {
 		return errResp(ErrMsgTooLarge, "%v > %v", msg.Size, ProtocolMaxMsgSize)
 	}
 	defer msg.Discard()
+
+	// Track the amount of time it takes to serve the request and run the handler
+	if metrics.Enabled {
+		h := fmt.Sprintf("%s/%s/%d/%#02x", p2p.HandleHistName, ProtocolName, p.Info().Version, msg.Code)
+		defer func(start time.Time) {
+			sampler := func() metrics.Sample {
+				return metrics.ResettingSample(
+					metrics.NewExpDecaySample(1028, 0.015),
+				)
+			}
+			metrics.GetOrRegisterHistogramLazy(h, nil, sampler).Update(time.Since(start).Microseconds())
+		}(time.Now())
+	}
 
 	// Handle the message depending on its contents
 	switch {

@@ -242,7 +242,7 @@ func ListenUDP(c conn, cfg Config) (*Table, error) {
 
 func newUDP(c conn, cfg Config) (*Table, *udp, error) {
 	udp := &udp{
-		conn:        c,
+		conn:        newMeteredConn(c),
 		priv:        cfg.PrivateKey,
 		netrestrict: cfg.NetRestrict,
 		closing:     make(chan struct{}),
@@ -255,7 +255,7 @@ func newUDP(c conn, cfg Config) (*Table, *udp, error) {
 	}
 	// TODO: separate TCP port
 	udp.ourEndpoint = makeEndpoint(realaddr, uint16(realaddr.Port))
-	tab, err := newTable(udp, PubkeyID(&cfg.PrivateKey.PublicKey), realaddr, cfg.NodeDBPath, cfg.Bootnodes)
+	tab, err := newMeteredTable(udp, PubkeyID(&cfg.PrivateKey.PublicKey), realaddr, cfg.NodeDBPath, cfg.Bootnodes)
 	if err != nil {
 		return nil, nil, err
 	}

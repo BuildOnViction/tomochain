@@ -310,31 +310,31 @@ func (api *PublicDebugAPI) Metrics(raw bool) (map[string]interface{}, error) {
 			switch metric := metric.(type) {
 			case metrics.Counter:
 				root[name] = map[string]interface{}{
-					"Overall": float64(metric.Count()),
+					"Overall": float64(metric.Snapshot().Count()),
 				}
 
 			case metrics.Meter:
 				root[name] = map[string]interface{}{
-					"AvgRate01Min": metric.Rate1(),
-					"AvgRate05Min": metric.Rate5(),
-					"AvgRate15Min": metric.Rate15(),
-					"MeanRate":     metric.RateMean(),
-					"Overall":      float64(metric.Count()),
+					"AvgRate01Min": metric.Snapshot().Rate1(),
+					"AvgRate05Min": metric.Snapshot().Rate5(),
+					"AvgRate15Min": metric.Snapshot().Rate15(),
+					"MeanRate":     metric.Snapshot().RateMean(),
+					"Overall":      float64(metric.Snapshot().Count()),
 				}
 
 			case metrics.Timer:
 				root[name] = map[string]interface{}{
-					"AvgRate01Min": metric.Rate1(),
-					"AvgRate05Min": metric.Rate5(),
-					"AvgRate15Min": metric.Rate15(),
-					"MeanRate":     metric.RateMean(),
-					"Overall":      float64(metric.Count()),
+					"AvgRate01Min": metric.Snapshot().Rate1(),
+					"AvgRate05Min": metric.Snapshot().Rate5(),
+					"AvgRate15Min": metric.Snapshot().Rate15(),
+					"MeanRate":     metric.Snapshot().RateMean(),
+					"Overall":      float64(metric.Snapshot().Count()),
 					"Percentiles": map[string]interface{}{
-						"5":  metric.Percentile(0.05),
-						"20": metric.Percentile(0.2),
-						"50": metric.Percentile(0.5),
-						"80": metric.Percentile(0.8),
-						"95": metric.Percentile(0.95),
+						"5":  metric.Snapshot().Percentile(0.05),
+						"20": metric.Snapshot().Percentile(0.2),
+						"50": metric.Snapshot().Percentile(0.5),
+						"80": metric.Snapshot().Percentile(0.8),
+						"95": metric.Snapshot().Percentile(0.95),
 					},
 				}
 
@@ -345,31 +345,31 @@ func (api *PublicDebugAPI) Metrics(raw bool) (map[string]interface{}, error) {
 			switch metric := metric.(type) {
 			case metrics.Counter:
 				root[name] = map[string]interface{}{
-					"Overall": float64(metric.Count()),
+					"Overall": float64(metric.Snapshot().Count()),
 				}
 
 			case metrics.Meter:
 				root[name] = map[string]interface{}{
-					"Avg01Min": format(metric.Rate1()*60, metric.Rate1()),
-					"Avg05Min": format(metric.Rate5()*300, metric.Rate5()),
-					"Avg15Min": format(metric.Rate15()*900, metric.Rate15()),
-					"Overall":  format(float64(metric.Count()), metric.RateMean()),
+					"Avg01Min": format(metric.Snapshot().Rate1()*60, metric.Snapshot().Rate1()),
+					"Avg05Min": format(metric.Snapshot().Rate5()*300, metric.Snapshot().Rate5()),
+					"Avg15Min": format(metric.Snapshot().Rate15()*900, metric.Snapshot().Rate15()),
+					"Overall":  format(float64(metric.Snapshot().Count()), metric.Snapshot().RateMean()),
 				}
 
 			case metrics.Timer:
 				root[name] = map[string]interface{}{
-					"Avg01Min": format(metric.Rate1()*60, metric.Rate1()),
-					"Avg05Min": format(metric.Rate5()*300, metric.Rate5()),
-					"Avg15Min": format(metric.Rate15()*900, metric.Rate15()),
-					"Overall":  format(float64(metric.Count()), metric.RateMean()),
-					"Maximum":  time.Duration(metric.Max()).String(),
-					"Minimum":  time.Duration(metric.Min()).String(),
+					"Avg01Min": format(metric.Snapshot().Rate1()*60, metric.Snapshot().Rate1()),
+					"Avg05Min": format(metric.Snapshot().Rate5()*300, metric.Snapshot().Rate5()),
+					"Avg15Min": format(metric.Snapshot().Rate15()*900, metric.Snapshot().Rate15()),
+					"Overall":  format(float64(metric.Snapshot().Count()), metric.Snapshot().RateMean()),
+					"Maximum":  time.Duration(metric.Snapshot().Max()).String(),
+					"Minimum":  time.Duration(metric.Snapshot().Min()).String(),
 					"Percentiles": map[string]interface{}{
-						"5":  time.Duration(metric.Percentile(0.05)).String(),
-						"20": time.Duration(metric.Percentile(0.2)).String(),
-						"50": time.Duration(metric.Percentile(0.5)).String(),
-						"80": time.Duration(metric.Percentile(0.8)).String(),
-						"95": time.Duration(metric.Percentile(0.95)).String(),
+						"5":  time.Duration(metric.Snapshot().Percentile(0.05)).String(),
+						"20": time.Duration(metric.Snapshot().Percentile(0.2)).String(),
+						"50": time.Duration(metric.Snapshot().Percentile(0.5)).String(),
+						"80": time.Duration(metric.Snapshot().Percentile(0.8)).String(),
+						"95": time.Duration(metric.Snapshot().Percentile(0.95)).String(),
 					},
 				}
 

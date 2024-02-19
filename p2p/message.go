@@ -39,9 +39,13 @@ import (
 // separate Msg with a bytes.Reader as Payload for each send.
 type Msg struct {
 	Code       uint64
-	Size       uint32 // size of the paylod
+	Size       uint32 // size of the raw payload
 	Payload    io.Reader
 	ReceivedAt time.Time
+
+	meterCap  Cap    // Protocol name and version for egress metering
+	meterCode uint64 // Message within protocol for egress metering
+	meterSize uint32 // Compressed message size for ingress metering
 }
 
 // Decode parses the RLP content of a message into
@@ -100,12 +104,11 @@ func Send(w MsgWriter, msgcode uint64, data interface{}) error {
 // SendItems writes an RLP with the given code and data elements.
 // For a call such as:
 //
-//    SendItems(w, code, e1, e2, e3)
+//	SendItems(w, code, e1, e2, e3)
 //
 // the message payload will be an RLP list containing the items:
 //
-//    [e1, e2, e3]
-//
+//	[e1, e2, e3]
 func SendItems(w MsgWriter, msgcode uint64, elems ...interface{}) error {
 	return Send(w, msgcode, elems)
 }
