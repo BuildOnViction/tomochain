@@ -52,7 +52,7 @@ func TestConsoleWelcome(t *testing.T) {
 	tomo.SetTemplateFunc("goarch", func() string { return runtime.GOARCH })
 	tomo.SetTemplateFunc("gover", runtime.Version)
 	tomo.SetTemplateFunc("tomover", func() string { return params.Version })
-	tomo.SetTemplateFunc("niltime", func() string { return time.Unix(1544771829, 0).Format(time.RFC1123) })
+	tomo.SetTemplateFunc("niltime", func() string { return time.Unix(1544771829, 0).Format("Mon Jan 02 2006 15:04:05 GMT-0700 (MST)") })
 	tomo.SetTemplateFunc("apis", func() string { return ipcAPIs })
 
 	// Verify the actual welcome message to the required template
@@ -137,7 +137,7 @@ func testAttachWelcome(t *testing.T, tomo *testtomo, endpoint, apis string) {
 	attach.SetTemplateFunc("gover", runtime.Version)
 	attach.SetTemplateFunc("tomover", func() string { return params.Version })
 	attach.SetTemplateFunc("etherbase", func() string { return tomo.Etherbase })
-	attach.SetTemplateFunc("niltime", func() string { return time.Unix(1544771829, 0).Format(time.RFC1123) })
+	attach.SetTemplateFunc("niltime", func() string { return time.Unix(1544771829, 0).Format("Mon Jan 02 2006 15:04:05 GMT-0700 (MST)") })
 	attach.SetTemplateFunc("ipc", func() bool { return strings.HasPrefix(endpoint, "ipc") })
 	attach.SetTemplateFunc("datadir", func() string { return tomo.Datadir })
 	attach.SetTemplateFunc("apis", func() string { return apis })
