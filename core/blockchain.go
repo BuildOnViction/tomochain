@@ -2218,6 +2218,27 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 	if bc.chainConfig.IsTIPTomoX(commonBlock.Number()) && bc.chainConfig.Posv != nil && commonBlock.NumberU64() > bc.chainConfig.Posv.Epoch {
 		bc.reorgTxMatches(deletedTxs, newChain)
 	}
+	add := types.TxDifference(addedTxs, deletedTxs)
+	log.Info("Reorg Log Data")
+	for i := 0; i < add.Len(); i++ {
+		log.Info("Reorg Log add Tx ", add[i].Hash().Hex(), "from", add[i].From().Hex(), "to", add[i].To(),"nonce",add[i].Nonce()," full data",add[i].String())
+	}
+	for i := 0; i < diff.Len(); i++ {
+		log.Info("Reorg Log remove Tx ", diff[i].Hash().Hex(), "from", diff[i].From().Hex(), "to", diff[i].To(),"nonce",diff[i].Nonce()," full data",diff[i].String())
+	}
+
+	c := bc.engine.(*posv.Posv)
+	for i := 0; i < len(newChain); i++ {
+		miner,_:=c.RecoverSigner(newChain[i].Header())
+		validator,_:=c.RecoverValidator(newChain[i].Header())
+		log.Info("Reorg Log add Block ", newChain[i].Hash().Hex(), "number", newChain[i].Number, "miner", miner.Hex(),"validator",validator.Hex()," diff",newChain[i].Difficulty()," full data",newChain[i].String())
+	}
+	for i := 0; i < len(oldChain); i++ {
+		miner,_:=c.RecoverSigner(oldChain[i].Header())
+		validator,_:=c.RecoverValidator(oldChain[i].Header())
+		log.Info(" Reorg Log remove Block ", oldChain[i].Hash().Hex(), "number", oldChain[i].Number, "miner", miner.Hex(),"validator",validator.Hex()," diff",oldChain[i].Difficulty()," full data",oldChain[i].String())
+	}
+
 	return nil
 }
 
