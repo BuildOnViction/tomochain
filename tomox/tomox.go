@@ -573,6 +573,11 @@ func (tomox *TomoX) GetTradingState(block *types.Block, author common.Address) (
 	return tradingstate.New(root, tomox.StateCache)
 }
 
+
+func (tomox *TomoX) GetEmptyTradingState() (*tradingstate.TradingStateDB, error) {
+	return tradingstate.New(tradingstate.EmptyRoot, tomox.StateCache)
+}
+
 func (tomox *TomoX) GetStateCache() tradingstate.Database {
 	return tomox.StateCache
 }
